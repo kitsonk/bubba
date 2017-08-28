@@ -1,0 +1,41 @@
+{
+  "name": "bubba-bot",
+  "version": "0.0.1",
+  "description": "A GitHub bot, making Eric's life easier.",
+  "main": "index.js",
+  "engineStrict": true,
+  "engines": {
+    "node": ">=6.5"
+  },
+  "bin": {
+    "bubba": "./index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kitsonk/bubba.git"
+  },
+  "author": "Kitson P. Kelly <me@kitsonkelly.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/kitsonk/bubba/issues"
+  },
+  "homepage": "https://github.com/kitsonk/bubba#readme",
+  "dependencies": {
+    "@dojo/core": "next",
+    "@dojo/has": "next",
+    "@dojo/shim": "next",
+    "@types/chalk": "^0.4.31",
+    "@types/node": "^6.0.0",
+    "@types/yargs": "^8.0.2",
+    "chalk": "^2.1.0",
+    "ts-node": "^3.3.0",
+    "typescript": "~2.4.2",
+    "yargs": "^8.0.2"
+  },
+  "devDependencies": {
+    "tslint": "^5.6.0"
+  }
+}
