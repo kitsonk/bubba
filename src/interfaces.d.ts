@@ -108,6 +108,24 @@ export namespace GitHub {
 		documentation_url: string;
 	}
 
+	interface Milestone {
+		url: string;
+		html_url: string;
+		labels_url: string;
+		id: number;
+		number: number;
+		state: 'open' | 'closed';
+		title: string;
+		description: string;
+		creator: Person;
+		open_issues: number;
+		closed_issues: number;
+		create_at: string;
+		updated_at: string;
+		closed_at: string;
+		due_on: string;
+	}
+
 	interface NotFoundMessage extends Message {
 		message: 'Not Found';
 	}
@@ -218,6 +236,13 @@ export namespace GitHub {
 		interface Label {
 			name: string;
 			color: string;
+		}
+
+		interface Milestone {
+			title: string;
+			state: 'open' | 'closed';
+			description: string;
+			due_on: string;
 		}
 
 		interface Release {

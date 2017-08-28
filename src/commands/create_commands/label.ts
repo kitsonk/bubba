@@ -3,7 +3,7 @@ import { Arguments, CommandBuilder } from 'yargs';
 import { createLabel, isGitHubMessage } from '../../github';
 import { Bubba, GitHub } from '../../interfaces';
 
-interface CreateTagArguments extends Arguments {
+interface CreateLabelArguments extends Arguments {
 	name: string;
 	color: string;
 	set?: string;
@@ -29,7 +29,7 @@ export const builder: CommandBuilder = function (yargs) {
 				type: 'string'
 			}
 		})
-		.check(({ color }: CreateTagArguments) => {
+		.check(({ color }: CreateLabelArguments) => {
 			if (!color.match(/^[a-fA-F0-9]{6}$/)) {
 				throw new Error('<color> must be specified as a 6-digit hex value\n');
 			}
@@ -37,7 +37,7 @@ export const builder: CommandBuilder = function (yargs) {
 		});
 };
 
-export async function handler({ name, color }: CreateTagArguments) {
+export async function handler({ name, color }: CreateLabelArguments) {
 	console.log(`- Creating label: ${name}\n`);
 	const label = { name, color };
 	const repoSet: Bubba.Repositories = require(DOJO2_REPOS);

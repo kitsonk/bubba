@@ -30,6 +30,7 @@
     "@dojo/interfaces": "next",
     "@dojo/shim": "next",
     "chalk": "^2.1.0",
+    "moment": "^2.18.1",
     "yargs": "^8.0.2"
   },
   "devDependencies": {
@@ -39,5 +40,8 @@
     "ts-node": "^3.3.0",
     "tslint": "^5.6.0",
     "typescript": "~2.4.2"
+  },
+  "yargs": {
+    "parse-numbers": false
   }
 }

@@ -71,6 +71,10 @@ export function createLabel(organization: string, repository: string, label: Git
 	return postRepo(organization, repository, 'labels', label);
 }
 
+export function createMilestone(organization: string, repository: string, milestone: GitHub.Post.Milestone): Promise<GitHub.Milestone | GitHub.Message> {
+	return postRepo(organization, repository, 'milestones', milestone);
+}
+
 /**
  * Create a release (release notes) on GitHub
  * @param organization The organization/owner the release notes belong to
