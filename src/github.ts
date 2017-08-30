@@ -12,6 +12,19 @@ const GITHUB_API_URI = 'https://api.github.com';
  */
 const GITHUB_TOKEN = process.env['GITHUB_TOKEN'];
 
+async function deleteRepo(organization: string, repository: string, command: string, resource: string): Promise<true | GitHub.Message> {
+	const response = await request(`${GITHUB_API_URI}/repos/${organization}/${repository}/${command}/${resource}`, {
+		headers: {
+			'Authorization': `token ${GITHUB_TOKEN}`
+		},
+		method: 'DELETE'
+	});
+	if (response.status === 204) {
+		return Promise.resolve<true>(true);
+	}
+	return response.json<GitHub.Message>();
+}
+
 /**
  * Get information from GitHub
  * @param organization The GitHub organization/owner to get the information from
@@ -85,6 +98,10 @@ export function createRelease(organization: string, repository: string, release:
 	return postRepo(organization, repository, 'releases', release);
 }
 
+export function deleteMilestone(organization: string, repository: string, milestone: number): Promise<true | GitHub.Message> {
+	return deleteRepo(organization, repository, 'milestones', String(milestone));
+}
+
 /**
  * Retrieve commits for a GitHub repository
  * @param organization The GitHub organization/owner
@@ -121,6 +138,10 @@ export function getGitRefsTags(organization: string, repository: string): Promis
  */
 export function getLabels(organization: string, repository: string): Promise<GitHub.Label[]> {
 	return getRepo(organization, repository, 'labels');
+}
+
+export function getMilestones(organization: string, repository: string): Promise<GitHub.Milestone[]> {
+	return getRepo(organization, repository, 'milestones');
 }
 
 /**

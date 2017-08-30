@@ -20,14 +20,7 @@ export const describe = 'create a milestone with the supplied title, and due dat
 export const builder: CommandBuilder = function (yargs) {
 	return yargs
 		.example('$0 create milestone foo 2017-12-01', 'creates a milestone named "foo" with a due data of 1st Dec 2017')
-		.coerce('title', (arg: any) => {
-			console.log('title', typeof arg);
-			return arg;
-		})
 		.options({
-			'title': {
-				type: 'string'
-			},
 			'description': {
 				alias: 'desc',
 				default: '',
@@ -50,9 +43,9 @@ export const builder: CommandBuilder = function (yargs) {
 };
 
 export async function handler({ description, due, state, title}: CreateMilestoneArguments) {
-	console.log(`- Creating milestone: ${String(title)}\n`);
+	console.log(`- Creating milestone: ${title}\n`);
 	const milestone = {
-		title: String(title),
+		title,
 		state,
 		description,
 		due_on: moment(due).toISOString()

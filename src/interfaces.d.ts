@@ -240,9 +240,9 @@ export namespace GitHub {
 
 		interface Milestone {
 			title: string;
-			state: 'open' | 'closed';
-			description: string;
-			due_on: string;
+			state?: 'open' | 'closed';
+			description?: string;
+			due_on?: string;
 		}
 
 		interface Release {
