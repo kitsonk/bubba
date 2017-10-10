@@ -28,6 +28,7 @@
 		"stores",
 		"test-extras",
 		"web-editor",
+		"webpack-contrib",
 		"widget-core",
 		"widgets"
 	]
