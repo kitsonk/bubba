@@ -1,8 +1,10 @@
-import { green, red } from 'chalk';
+import chalk from 'chalk';
 import * as moment from 'moment';
 import { Arguments, CommandBuilder } from 'yargs';
 import { createMilestone, isGitHubMessage } from '../../github';
 import { Bubba, GitHub } from '../../interfaces';
+
+const { green, red } = chalk;
 
 interface CreateMilestoneArguments extends Arguments {
 	title: string;

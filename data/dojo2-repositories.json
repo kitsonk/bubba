@@ -24,7 +24,7 @@
 		"meta",
 		"routing",
 		"shim",
-		"static-optimize-plugin",
+		"streams",
 		"stores",
 		"test-extras",
 		"web-editor",

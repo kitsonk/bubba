@@ -1,7 +1,9 @@
-import { green, red, yellow } from 'chalk';
+import chalk from 'chalk';
 import { Arguments, CommandBuilder } from 'yargs';
 import { deleteMilestone, getMilestones } from '../../github';
 import { Bubba, GitHub } from '../../interfaces';
+
+const { green, red, yellow } = chalk;
 
 interface DeleteMilestoneArguments extends Arguments {
 	title: string;

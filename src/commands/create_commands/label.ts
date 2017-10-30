@@ -1,7 +1,9 @@
-import { green, red } from 'chalk';
+import chalk from 'chalk';
 import { Arguments, CommandBuilder } from 'yargs';
 import { createLabel, isGitHubMessage } from '../../github';
 import { Bubba, GitHub } from '../../interfaces';
+
+const { green, red } = chalk;
 
 interface CreateLabelArguments extends Arguments {
 	name: string;

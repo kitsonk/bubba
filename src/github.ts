@@ -140,6 +140,11 @@ export function getLabels(organization: string, repository: string): Promise<Git
 	return getRepo(organization, repository, 'labels');
 }
 
+/**
+ * Retrieve the milestones for a GitHub repository
+ * @param organization The GitHub organization/owner
+ * @param repository The GitHub repository
+ */
 export function getMilestones(organization: string, repository: string): Promise<GitHub.Milestone[]> {
 	return getRepo(organization, repository, 'milestones');
 }
@@ -176,8 +181,19 @@ export function isGitHubMessage(value: any): value is GitHub.Message {
  * @param organization The organization/owner the label belongs to
  * @param repository The repository the label belongs to
  * @param name The name of the label to update
- * @param label The label to be created
+ * @param label The label to be updated
  */
 export function updateLabel(organization: string, repository: string, name: string, label: GitHub.Post.Label): Promise<GitHub.Label | GitHub.Message> {
 	return patchRepo(organization, repository, `labels/${name}`, label);
+}
+
+/**
+ * Update a milestone on GitHub
+ * @param organization The organization/owner the milestone belongs to
+ * @param repository The repository the milestone belongs to
+ * @param id The ID number of the milestone to update
+ * @param milestone The milestone to be updated
+ */
+export function updateMilestone(organization: string, repository: string, id: number, milestone: Partial<GitHub.Post.Milestone>): Promise<GitHub.Milestone | GitHub.Message> {
+	return patchRepo(organization, repository, `milestones/${id}`, milestone);
 }

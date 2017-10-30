@@ -60,6 +60,18 @@ Would create a milestone named `foo` which would be due on the 21st December 201
 
 The command will output the success ofr failure of creating the milestone for each repository.
 
+### delete
+
+#### milestone
+
+`bubba delete milestone <title> [options]` would delete a milestone across the Dojo 2 repositories.  For example:
+
+```sh
+> bubba delete miletstone foo
+```
+
+Would delete a milestone named `foo` from all the Dojo 2 repositories.
+
 ### release
 
 `bubba release <repo> <tag> [options]` will generate a set of release notes based on the commit comments that were supplied in the commit messages.  By default, the release notes will be generated using the previous tag before the one specified.  For example:
@@ -73,6 +85,18 @@ Would generate a set of release notes as a release on `dojo/widget-core` for the
 ### tags
 
 `bubba tags <repo>` will output the list of tags for a particular repository.  Each tag will be output, and those tags that are already released will be noted with a `[released]` after the tag name.
+
+### update
+
+#### milestone
+
+`bubba update milestone <title> [options]` will update a milestone across the Dojo 2 repositories.  For example:
+
+```sh
+> bubba update milestone foo --due 2017-12-01
+```
+
+Would update the due date for the milestone named `foo` across the Dojo 2 repositories.
 
 ## License
 

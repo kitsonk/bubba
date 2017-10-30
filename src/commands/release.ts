@@ -1,6 +1,8 @@
 import { Arguments, CommandBuilder } from 'yargs';
-import { bold, green, red } from 'chalk';
+import chalk from 'chalk';
 import { createRelease, getCompare, getTags, isGitHubMessage } from '../github';
+
+const { bold, green, red } = chalk;
 
 interface ReleaseArguments extends Arguments {
 	draft: boolean;

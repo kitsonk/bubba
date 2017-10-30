@@ -1,6 +1,8 @@
 import * as process from 'process';
 import * as yargs from 'yargs';
-import { bold, red } from 'chalk';
+import chalk from 'chalk';
+
+const { red, bold } = chalk;
 
 const packageJson: { version: string; } = require('../package.json');
 
