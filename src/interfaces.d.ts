@@ -94,6 +94,37 @@ export namespace GitHub {
 		field: string;
 	}
 
+	interface Issue {
+		id: number;
+		url: string;
+		repository_url: string;
+		labels_url: string;
+		comments_url: string;
+		events_url: string;
+		html_url: string;
+		number: number;
+		state: string;
+		title: string;
+		body: string;
+		user: Person;
+		labels: Label[];
+		assignee: Person;
+		assignees: Person[];
+		milestone: Milestone;
+		locked: boolean;
+		comments: number;
+		pull_request?: {
+			url: string;
+			html_url: string;
+			diff_url: string;
+			patch_url: string;
+		},
+		closed_at: string | null;
+		created_at: string;
+		updated_at: string | null;
+		closed_by: Person | null;
+	}
+
 	interface Label {
 		id: number;
 		url: string;

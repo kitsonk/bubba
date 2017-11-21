@@ -35,7 +35,8 @@ export const builder: CommandBuilder = function (yargs) {
 				type: 'string'
 			}
 		})
-		.check(({ due, state }: UpdateMilestoneArguments) => {
+		.check((args) => {
+			const { due, state } = args as UpdateMilestoneArguments;
 			if (state && !(state === 'open' || state === 'closed')) {
 				throw new Error('--state must be either "open" or "closed"\n');
 			}

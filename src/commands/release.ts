@@ -1,8 +1,23 @@
+import * as ProgressBar from 'progress';
 import { Arguments, CommandBuilder } from 'yargs';
 import chalk from 'chalk';
-import { createRelease, getCompare, getTags, isGitHubMessage } from '../github';
+import { createRelease, getCompare, getIssue, getTags, isGitHubMessage } from '../github';
+import { GitHub } from '../interfaces';
 
 const { bold, green, red } = chalk;
+
+interface Changes {
+	breaking: string[];
+	enhancement: string[];
+	fix: string[];
+	uncategorized: string[];
+}
+
+interface CommitMetaData {
+	message: string;
+	pr: number;
+	category?: 'breaking' | 'enhancement' | 'fix';
+}
 
 interface ReleaseArguments extends Arguments {
 	draft: boolean;
@@ -14,18 +29,19 @@ interface ReleaseArguments extends Arguments {
 }
 
 /**
- * A preamble for the release notes
+ * Regex that matches patterns that look like a GitHub comment that resolves or fixes and issue.
+ *
+ * Diagram: https://goo.gl/xvpZtt
  */
-const RELEASE_NOTE_PREAMBLE = `## Breaking Changes
-
-## New Features
-
-## Fixes
-
-`;
+const RESOLVES_REGEX = /(?:resolv|fix)(?:es)?:?\s+(?:https:\/\/github\.com\/)?(?:([a-z0-9\-]+)\/([a-z0-9\-]+))?(?:\/issues\/|#)(\d+)/i;
 
 function initialCap(str: string) {
 	return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function parseCommitMessage(message: string) {
+	const [ firstLine, ...lines ] = message.split(/\r?\n/);
+	return `* ${firstLine}\n${lines.length ? `  <details><summary>Details</summary>\n  ${lines.join('\n  ')}\n  </details>\n` : ''}\n`;
 }
 
 export const command = 'release <repo> <tag> [options]';
@@ -72,7 +88,14 @@ export async function handler({ draft, from, org, prerelease, repo, tag }: Relea
 	const name = preReleaseTag ? `Release ${version} ${initialCap(preReleaseTag)} ${release}` : `Release ${version}`;
 
 	// retrieve the available tags for the repository
-	const tags = (await getTags(org, repo)).map(({ name, commit: { sha }}) => {
+	let tagData: GitHub.Tag[] = [];
+	let page = 1;
+	let tagResponse = await getTags(org, repo, page);
+	while (tagResponse.length) {
+		tagData = [ ...tagData, ...tagResponse ];
+		tagResponse = await getTags(org, repo, ++page);
+	}
+	const tags = tagData.map(({ name, commit: { sha }}) => {
 		return { name, sha };
 	});
 	const tagIndex = tags.map(({ name }) => name).indexOf(tag);
@@ -98,15 +121,106 @@ export async function handler({ draft, from, org, prerelease, repo, tag }: Relea
 		.map((commit) => commit.commit.message).filter((message) => !message.match(/Update\spackage\smetadata/i));
 	// remove the last commit message, which should just be the meta data update message
 	messages.pop();
-	// generate the body of the release notes
-	const body = messages.reduce((releaseNotes, message) => {
-		const [ firstLine, ...lines ] = message.split(/\r?\n/);
-		let details = '\n';
-		if (lines.length) {
-			details += `  <details><summary>Details</summary>\n  ${lines.join('\n  ')}\n  </details>\n`;
+
+	// Now take the commit messages and try to find a related PR
+	const commitInfo = messages.map((message) => {
+		const prMatch = message.match(/\(#(\d+)\)/);
+		return {
+			message,
+			pr: prMatch ? Number(prMatch[1]) : undefined
+		} as CommitMetaData;
+	});
+
+	// Display a progress bar that displays the progress of resolving the commit info
+	const progressBar = new ProgressBar('  Processing Commits: [:bar] :current/:total', {
+		complete: '=',
+		incomplete: ' ',
+		width: 20,
+		total: commitInfo.length
+	});
+
+	for (let i = 0; i < commitInfo.length; i++) {
+		progressBar.tick();
+		const info = commitInfo[i];
+
+		// check the labels on issue to set the category
+		function checkLabel(label: GitHub.Label) {
+			if (label.name === 'breaking-change') {
+				info.category = 'breaking';
+			}
+			if (info.category) {
+				return;
+			}
+			if (label.name === 'enhancement') {
+				info.category = 'enhancement';
+			}
+			else if (label.name === 'bug') {
+				info.category = 'fix';
+			}
 		}
-		return releaseNotes + '* ' + firstLine + details + '\n';
-	}, RELEASE_NOTE_PREAMBLE);
+
+		const commitResolves = info.message.match(RESOLVES_REGEX);
+		// if the commit message looks like it is fixing an issue, we will lookup that issue
+		if (commitResolves) {
+			const [ , resolveOrg, resolveRepo, resolveIssueNumber ] = commitResolves;
+			const resolvesIssue = await getIssue(resolveOrg || org, resolveRepo || repo, Number(resolveIssueNumber));
+			resolvesIssue.labels.forEach(checkLabel);
+		}
+		// if we found the PR from the message, look it up
+		else if (info.pr) {
+			const issue = await getIssue(org, repo, info.pr);
+			const resolves = issue.body.match(RESOLVES_REGEX);
+			// If it looks like the PR resolves another issue, we will use the labels on that issue
+			if (resolves) {
+				const [ , resolveOrg, resolveRepo, resolveIssueNumber ] = resolves;
+				const resolvesIssue = await getIssue(resolveOrg || org, resolveRepo || repo, Number(resolveIssueNumber));
+				resolvesIssue.labels.forEach(checkLabel);
+			}
+			// otherwise we will just look at labels on the PR
+			else {
+				issue.labels.forEach(checkLabel);
+			}
+		}
+	}
+
+	console.log();
+
+	// Now we create a structure the categorise the changes
+	const changes = commitInfo.reduce((changeMap, info) => {
+		if (!info.category) {
+			changeMap.uncategorized.push(info.message);
+		}
+		else if (info.category === 'breaking') {
+			changeMap.breaking.push(info.message);
+		}
+		else if (info.category === 'enhancement') {
+			changeMap.enhancement.push(info.message);
+		}
+		else {
+			changeMap.fix.push(info.message);
+		}
+		return changeMap;
+	}, {
+		breaking: [],
+		enhancement: [],
+		fix: [],
+		uncategorized: []
+	} as Changes);
+
+	// Now we will assemble it into the release notes body
+	let body = '';
+	if (changes.breaking.length) {
+		body += `## ⚠️ Breaking Changes\n\n` + changes.breaking.map(parseCommitMessage).join('\n');
+	}
+	if (changes.fix.length) {
+		body += `## ✅ Fixes\n\n` + changes.fix.map(parseCommitMessage).join('\n');
+	}
+	if (changes.enhancement.length) {
+		body += `## 👍 Enhancements\n\n` + changes.enhancement.map(parseCommitMessage).join('\n');
+	}
+	if (changes.uncategorized.length) {
+		body += `<!-- uncategorized -->\n---\n\n` + changes.uncategorized.map(parseCommitMessage).join('\n');
+	}
 
 	// create the release on GitHub
 	const response = await createRelease(org, repo, {

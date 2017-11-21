@@ -31,7 +31,8 @@ export const builder: CommandBuilder = function (yargs) {
 				type: 'string'
 			}
 		})
-		.check(({ color }: CreateLabelArguments) => {
+		.check((args) => {
+			const { color } = args as CreateLabelArguments;
 			if (!color.match(/^[a-fA-F0-9]{6}$/)) {
 				throw new Error('<color> must be specified as a 6-digit hex value\n');
 			}

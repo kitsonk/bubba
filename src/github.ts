@@ -149,13 +149,17 @@ export function getMilestones(organization: string, repository: string): Promise
 	return getRepo(organization, repository, 'milestones');
 }
 
+export function getIssue(organization: string, repository: string, issue: number): Promise<GitHub.Issue> {
+	return getRepo(organization, repository, `issues/${issue}`);
+}
+
 /**
  * Retrieve the releases for a GitHub repository
  * @param organization The GitHub organization/owner
  * @param repository The GitHub repository
  */
-export function getReleases(organization: string, repository: string): Promise<GitHub.Release[]> {
-	return getRepo(organization, repository, 'releases');
+export function getReleases(organization: string, repository: string, page = 1): Promise<GitHub.Release[]> {
+	return getRepo(organization, repository, 'releases', page);
 }
 
 /**

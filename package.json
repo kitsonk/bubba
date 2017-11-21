@@ -35,10 +35,11 @@
   },
   "devDependencies": {
     "@types/node": "^6.0.0",
+    "@types/progress": "^2.0.0",
     "@types/yargs": "^8.0.2",
     "ts-node": "^3.3.0",
     "tslint": "^5.8.0",
-    "typescript": "~2.5.3"
+    "typescript": "~2.6.1"
   },
   "yargs": {
     "parse-numbers": false
