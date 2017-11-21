@@ -1,6 +1,6 @@
 {
   "name": "bubba-bot",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "description": "A GitHub bot, making Eric's life easier.",
   "main": "index.js",
   "engineStrict": true,
@@ -31,6 +31,7 @@
     "@dojo/shim": "~0.1.0",
     "chalk": "^2.3.0",
     "moment": "^2.19.1",
+    "progress": "^2.0.0",
     "yargs": "^10.0.3"
   },
   "devDependencies": {
