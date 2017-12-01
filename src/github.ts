@@ -102,6 +102,10 @@ export function deleteMilestone(organization: string, repository: string, milest
 	return deleteRepo(organization, repository, 'milestones', String(milestone));
 }
 
+export function deleteLabel(organization: string, repository: string, label: string): Promise<true | GitHub.Message> {
+	return deleteRepo(organization, repository, 'labels', label);
+}
+
 /**
  * Retrieve commits for a GitHub repository
  * @param organization The GitHub organization/owner
