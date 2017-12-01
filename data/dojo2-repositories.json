@@ -10,6 +10,8 @@
 		"cli-export-project",
 		"cli-test-intern",
 		"core",
+		"crypto",
+		"dataviz",
 		"dgrid",
 		"dojo.io",
 		"dojo2-package-template",
