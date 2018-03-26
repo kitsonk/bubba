@@ -8,7 +8,7 @@ import { GitHub } from './interfaces';
 const GITHUB_API_URI = 'https://api.github.com';
 
 /**
- * The GitHub user authoriazation token to perform the requests on behalf of
+ * The GitHub user authorization token to perform the requests on behalf of
  */
 const GITHUB_TOKEN = process.env['GITHUB_TOKEN'];
 
