@@ -1,6 +1,6 @@
 {
   "name": "bubba-bot",
-  "version": "0.0.11",
+  "version": "0.0.13",
   "description": "A GitHub bot, making Eric's life easier.",
   "main": "index.js",
   "engineStrict": true,
