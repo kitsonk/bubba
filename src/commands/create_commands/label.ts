@@ -16,17 +16,19 @@ const DOJO2_REPOS = '../../../data/dojo2-repositories.json';
 
 export const command = 'label <name> <color> [options]';
 
-export const describe = 'create a label with the supplied name, color, and description\n\nby default this will create the label across Dojo 2 repos';
+export const describe =
+	'create a label with the supplied name, color, and description\n\nby default this will create the label across Dojo 2 repos';
 
-export const builder: CommandBuilder = function (yargs) {
+export const builder: CommandBuilder = function(yargs) {
 	return yargs
 		.example('$0 create label foo-bar cccccc', 'creates a label name "foo-bar" for all Dojo 2 repositories')
 		.options({
-			'set': {
-				describe: 'specify a JSON file that contains the set of repositories to create the labels for, defaults to a built in set of Dojo 2 repositories',
+			set: {
+				describe:
+					'specify a JSON file that contains the set of repositories to create the labels for, defaults to a built in set of Dojo 2 repositories',
 				type: 'string'
 			},
-			'repo': {
+			repo: {
 				describe: 'create the label on a specified repository',
 				type: 'string'
 			}
@@ -45,7 +47,7 @@ export async function handler({ name, color }: CreateLabelArguments) {
 	const label = { name, color };
 	const repoSet: Bubba.Repositories = require(DOJO2_REPOS);
 	const promises: Promise<GitHub.Label | GitHub.Message>[] = [];
-	const repos: { org: string, repo: string }[] = [];
+	const repos: { org: string; repo: string }[] = [];
 	for (const org in repoSet) {
 		repoSet[org].forEach((repo) => {
 			repos.push({ org, repo });
@@ -58,10 +60,13 @@ export async function handler({ name, color }: CreateLabelArguments) {
 		if (isGitHubMessage(result)) {
 			console.log(red(`> Failed on "${org}/${repo}" with "${result.message}"`));
 			if (result.errors) {
-				result.errors.forEach((err) => console.log(red(`  Error: { resource: "${err.resource}", core: "${err.code}", field: "${err.field}" }`)));
+				result.errors.forEach((err) =>
+					console.log(
+						red(`  Error: { resource: "${err.resource}", core: "${err.code}", field: "${err.field}" }`)
+					)
+				);
 			}
-		}
-		else {
+		} else {
 			console.log(green(`> Created on "${org}/${repo}"`));
 		}
 	});

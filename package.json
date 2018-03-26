@@ -11,7 +11,8 @@
     "bubba": "./index.js"
   },
   "scripts": {
-    "prepublish": "tsc -p .",
+    "precommit": "lint-staged",
+    "prepare": "tsc -p .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,22 +26,38 @@
   },
   "homepage": "https://github.com/kitsonk/bubba#readme",
   "dependencies": {
-    "@dojo/core": "~0.1.0",
-    "@dojo/has": "~0.1.0",
-    "@dojo/interfaces": "~0.1.0",
-    "@dojo/shim": "~0.1.0",
-    "chalk": "^2.3.0",
-    "moment": "^2.19.1",
+    "@dojo/core": "~0.4.0",
+    "@dojo/has": "~0.1.2",
+    "@dojo/shim": "~0.2.7",
+    "chalk": "^2.3.2",
+    "moment": "^2.21.0",
     "progress": "^2.0.0",
-    "yargs": "^10.0.3"
+    "yargs": "^11.0.0"
   },
   "devDependencies": {
     "@types/node": "^6.0.0",
     "@types/progress": "^2.0.0",
-    "@types/yargs": "^8.0.2",
-    "ts-node": "^3.3.0",
-    "tslint": "^5.8.0",
-    "typescript": "~2.6.1"
+    "@types/yargs": "^11.0.0",
+    "husky": "0.14.3",
+    "lint-staged": "6.0.0",
+    "prettier": "1.9.2",
+    "ts-node": "^5.0.1",
+    "tslint": "^5.9.1",
+    "typescript": "~2.7.2"
+  },
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "prettier": {
+    "singleQuote": true,
+    "tabWidth": 4,
+    "useTabs": true,
+    "parser": "typescript",
+    "printWidth": 120,
+    "arrowParens": "always"
   },
   "yargs": {
     "parse-numbers": false

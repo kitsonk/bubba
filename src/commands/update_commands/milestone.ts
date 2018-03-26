@@ -17,21 +17,28 @@ const DOJO2_REPOS = '../../../data/dojo2-repositories.json';
 
 export const command = 'milestone <title> [options]';
 
-export const describe = 'update a milestone with the supplied title\n\nby default this will update the milestone across Dojo 2 repos';
+export const describe =
+	'update a milestone with the supplied title\n\nby default this will update the milestone across Dojo 2 repos';
 
-export const builder: CommandBuilder = function (yargs) {
+export const builder: CommandBuilder = function(yargs) {
 	return yargs
-		.example('$0 update milestone foo --due 2017-12-01', 'updates a milestone named "foo" with a due data of 1st Dec 2017')
-		.example('$0 update milestone foo --description "Foo bar baz"', 'updates a milestone named "foo" with a description of "Foo bar baz"')
+		.example(
+			'$0 update milestone foo --due 2017-12-01',
+			'updates a milestone named "foo" with a due data of 1st Dec 2017'
+		)
+		.example(
+			'$0 update milestone foo --description "Foo bar baz"',
+			'updates a milestone named "foo" with a description of "Foo bar baz"'
+		)
 		.options({
-			'description': {
+			description: {
 				alias: 'desc',
 				type: 'string'
 			},
-			'due': {
+			due: {
 				type: 'string'
 			},
-			'state': {
+			state: {
 				type: 'string'
 			}
 		})
@@ -63,24 +70,24 @@ export async function handler({ description, due, state, title }: UpdateMileston
 	}
 	const repoSet: Bubba.Repositories = require(DOJO2_REPOS);
 	const promises: Promise<GitHub.Milestone[]>[] = [];
-	const repos: { org: string, repo: string }[] = [];
+	const repos: { org: string; repo: string }[] = [];
 	for (const org in repoSet) {
 		repoSet[org].forEach((repo) => {
 			repos.push({ org, repo });
 			promises.push(getMilestones(org, repo));
 		});
 	}
-	const milestoneMaps = (await Promise.all(promises))
-		.map((response) => new Map(response.map(({ title, number: num }): [ string, number ] => [ title, num ])));
+	const milestoneMaps = (await Promise.all(promises)).map(
+		(response) => new Map(response.map(({ title, number: num }): [string, number] => [title, num]))
+	);
 	const milestoneNumbers = milestoneMaps.map((milestoneMap) => milestoneMap.get(title));
 	const updatePromises: Promise<GitHub.Milestone | GitHub.Message>[] = [];
-	const updateRepos: { org: string, repo: string }[] = [];
+	const updateRepos: { org: string; repo: string }[] = [];
 	milestoneNumbers.forEach((milestoneNumber, idx) => {
 		const { org, repo } = repos[idx];
 		if (typeof milestoneNumber === 'undefined') {
 			console.log(yellow(`> Not found on "${org}/${repo}"`));
-		}
-		else {
+		} else {
 			updatePromises.push(updateMilestone(org, repo, milestoneNumber, milestone));
 			updateRepos.push({ org, repo });
 		}
@@ -90,10 +97,13 @@ export async function handler({ description, due, state, title }: UpdateMileston
 		if (isGitHubMessage(result)) {
 			console.log(red(`> Failed on "${org}/${repo}" with "${result.message}"`));
 			if (result.errors) {
-				result.errors.forEach((err) => console.log(red(`  Error: { resource: "${err.resource}", core: "${err.code}", field: "${err.field}" }`)));
+				result.errors.forEach((err) =>
+					console.log(
+						red(`  Error: { resource: "${err.resource}", core: "${err.code}", field: "${err.field}" }`)
+					)
+				);
 			}
-		}
-		else {
+		} else {
 			console.log(green(`> Updated on "${org}/${repo}"`));
 		}
 	});

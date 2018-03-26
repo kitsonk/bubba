@@ -17,18 +17,22 @@ const DOJO2_REPOS = '../../../data/dojo2-repositories.json';
 
 export const command = 'milestone <title> <due> [options]';
 
-export const describe = 'create a milestone with the supplied title, and due date\n\nby default this will create the milestone across Dojo 2 repos';
+export const describe =
+	'create a milestone with the supplied title, and due date\n\nby default this will create the milestone across Dojo 2 repos';
 
-export const builder: CommandBuilder = function (yargs) {
+export const builder: CommandBuilder = function(yargs) {
 	return yargs
-		.example('$0 create milestone foo 2017-12-01', 'creates a milestone named "foo" with a due data of 1st Dec 2017')
+		.example(
+			'$0 create milestone foo 2017-12-01',
+			'creates a milestone named "foo" with a due data of 1st Dec 2017'
+		)
 		.options({
-			'description': {
+			description: {
 				alias: 'desc',
 				default: '',
 				type: 'string'
 			},
-			'state': {
+			state: {
 				default: 'open',
 				type: 'string'
 			}
@@ -45,7 +49,7 @@ export const builder: CommandBuilder = function (yargs) {
 		});
 };
 
-export async function handler({ description, due, state, title}: CreateMilestoneArguments) {
+export async function handler({ description, due, state, title }: CreateMilestoneArguments) {
 	console.log(`- Creating milestone: ${title}\n`);
 	const milestone = {
 		title,
@@ -55,7 +59,7 @@ export async function handler({ description, due, state, title}: CreateMilestone
 	};
 	const repoSet: Bubba.Repositories = require(DOJO2_REPOS);
 	const promises: Promise<GitHub.Milestone | GitHub.Message>[] = [];
-	const repos: { org: string, repo: string }[] = [];
+	const repos: { org: string; repo: string }[] = [];
 	for (const org in repoSet) {
 		repoSet[org].forEach((repo) => {
 			repos.push({ org, repo });
@@ -68,10 +72,13 @@ export async function handler({ description, due, state, title}: CreateMilestone
 		if (isGitHubMessage(result)) {
 			console.log(red(`> Failed on "${org}/${repo}" with "${result.message}"`));
 			if (result.errors) {
-				result.errors.forEach((err) => console.log(red(`  Error: { resource: "${err.resource}", core: "${err.code}", field: "${err.field}" }`)));
+				result.errors.forEach((err) =>
+					console.log(
+						red(`  Error: { resource: "${err.resource}", core: "${err.code}", field: "${err.field}" }`)
+					)
+				);
 			}
-		}
-		else {
+		} else {
 			console.log(green(`> Created on "${org}/${repo}"`));
 		}
 	});

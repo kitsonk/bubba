@@ -1,5 +1,5 @@
 import * as process from 'process';
-import request from '@dojo/core/request';
+import request from '@dojo/core/request/providers/node';
 import { GitHub } from './interfaces';
 
 /**
@@ -12,10 +12,15 @@ const GITHUB_API_URI = 'https://api.github.com';
  */
 const GITHUB_TOKEN = process.env['GITHUB_TOKEN'];
 
-async function deleteRepo(organization: string, repository: string, command: string, resource: string): Promise<true | GitHub.Message> {
+async function deleteRepo(
+	organization: string,
+	repository: string,
+	command: string,
+	resource: string
+): Promise<true | GitHub.Message> {
 	const response = await request(`${GITHUB_API_URI}/repos/${organization}/${repository}/${command}/${resource}`, {
 		headers: {
-			'Authorization': `token ${GITHUB_TOKEN}`
+			Authorization: `token ${GITHUB_TOKEN}`
 		},
 		method: 'DELETE'
 	});
@@ -35,7 +40,7 @@ async function deleteRepo(organization: string, repository: string, command: str
 async function getRepo<T>(organization: string, repository: string, command: string, page = 1): Promise<T> {
 	return (await request(`${GITHUB_API_URI}/repos/${organization}/${repository}/${command}?page=${page}`, {
 		headers: {
-			'Authorization': `token ${GITHUB_TOKEN}`
+			Authorization: `token ${GITHUB_TOKEN}`
 		}
 	})).json<T>();
 }
@@ -51,7 +56,7 @@ async function patchRepo<T>(organization: string, repository: string, command: s
 	return (await request(`${GITHUB_API_URI}/repos/${organization}/${repository}/${command}`, {
 		body: JSON.stringify(body),
 		headers: {
-			'Authorization': `token ${GITHUB_TOKEN}`
+			Authorization: `token ${GITHUB_TOKEN}`
 		},
 		method: 'PATCH'
 	})).json<T>();
@@ -68,7 +73,7 @@ async function postRepo<T>(organization: string, repository: string, command: st
 	return (await request(`${GITHUB_API_URI}/repos/${organization}/${repository}/${command}`, {
 		body: JSON.stringify(body),
 		headers: {
-			'Authorization': `token ${GITHUB_TOKEN}`
+			Authorization: `token ${GITHUB_TOKEN}`
 		},
 		method: 'POST'
 	})).json<T>();
@@ -80,11 +85,19 @@ async function postRepo<T>(organization: string, repository: string, command: st
  * @param repository The repository the label belongs to
  * @param label The label to be created
  */
-export function createLabel(organization: string, repository: string, label: GitHub.Post.Label): Promise<GitHub.Label | GitHub.Message> {
+export function createLabel(
+	organization: string,
+	repository: string,
+	label: GitHub.Post.Label
+): Promise<GitHub.Label | GitHub.Message> {
 	return postRepo(organization, repository, 'labels', label);
 }
 
-export function createMilestone(organization: string, repository: string, milestone: GitHub.Post.Milestone): Promise<GitHub.Milestone | GitHub.Message> {
+export function createMilestone(
+	organization: string,
+	repository: string,
+	milestone: GitHub.Post.Milestone
+): Promise<GitHub.Milestone | GitHub.Message> {
 	return postRepo(organization, repository, 'milestones', milestone);
 }
 
@@ -94,11 +107,19 @@ export function createMilestone(organization: string, repository: string, milest
  * @param repository The repository the release notes belong to
  * @param release The release information to be created on GitHub
  */
-export function createRelease(organization: string, repository: string, release: GitHub.Post.Release): Promise<GitHub.Release | GitHub.Message> {
+export function createRelease(
+	organization: string,
+	repository: string,
+	release: GitHub.Post.Release
+): Promise<GitHub.Release | GitHub.Message> {
 	return postRepo(organization, repository, 'releases', release);
 }
 
-export function deleteMilestone(organization: string, repository: string, milestone: number): Promise<true | GitHub.Message> {
+export function deleteMilestone(
+	organization: string,
+	repository: string,
+	milestone: number
+): Promise<true | GitHub.Message> {
 	return deleteRepo(organization, repository, 'milestones', String(milestone));
 }
 
@@ -122,7 +143,12 @@ export function getCommits(organization: string, repository: string): Promise<Gi
  * @param reference1 The first reference for the comparison
  * @param reference2 The second reference for the comparison
  */
-export function getCompare(organization: string, repository: string, reference1: string, reference2: string): Promise<GitHub.Comparison> {
+export function getCompare(
+	organization: string,
+	repository: string,
+	reference1: string,
+	reference2: string
+): Promise<GitHub.Comparison> {
 	return getRepo(organization, repository, `compare/${reference1}...${reference2}`);
 }
 
@@ -191,7 +217,12 @@ export function isGitHubMessage(value: any): value is GitHub.Message {
  * @param name The name of the label to update
  * @param label The label to be updated
  */
-export function updateLabel(organization: string, repository: string, name: string, label: GitHub.Post.Label): Promise<GitHub.Label | GitHub.Message> {
+export function updateLabel(
+	organization: string,
+	repository: string,
+	name: string,
+	label: GitHub.Post.Label
+): Promise<GitHub.Label | GitHub.Message> {
 	return patchRepo(organization, repository, `labels/${name}`, label);
 }
 
@@ -202,6 +233,11 @@ export function updateLabel(organization: string, repository: string, name: stri
  * @param id The ID number of the milestone to update
  * @param milestone The milestone to be updated
  */
-export function updateMilestone(organization: string, repository: string, id: number, milestone: Partial<GitHub.Post.Milestone>): Promise<GitHub.Milestone | GitHub.Message> {
+export function updateMilestone(
+	organization: string,
+	repository: string,
+	id: number,
+	milestone: Partial<GitHub.Post.Milestone>
+): Promise<GitHub.Milestone | GitHub.Message> {
 	return patchRepo(organization, repository, `milestones/${id}`, milestone);
 }

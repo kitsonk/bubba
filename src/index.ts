@@ -4,10 +4,10 @@ import chalk from 'chalk';
 
 const { red, bold } = chalk;
 
-const packageJson: { version: string; } = require('../package.json');
+const packageJson: { version: string } = require('../package.json');
 
 console.log();
-console.log(bold('bubba – Making Eric\'s life easier'));
+console.log(bold("bubba – Making Eric's life easier"));
 console.log();
 
 // Check to ensure that the GitHub authorization token is available in the environment
@@ -19,11 +19,10 @@ if (!process.env['GITHUB_TOKEN']) {
 yargs
 	.usage('usage: $0 <command>')
 	.commandDir('commands', {
-		extensions: [ 'js', 'ts' ]
+		extensions: ['js', 'ts']
 	})
 	.demandCommand(1, 'At least one command required\n')
 	.version('version', 'Show version information', `Version ${packageJson.version}\n`)
 	.alias('version', 'v')
 	.help()
-	.wrap(80)
-	.argv;
+	.wrap(80).argv;

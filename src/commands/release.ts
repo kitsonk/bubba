@@ -40,36 +40,40 @@ function initialCap(str: string) {
 }
 
 function parseCommitMessage(message: string) {
-	const [ firstLine, ...lines ] = message.split(/\r?\n/);
-	return `* ${firstLine}\n${lines.length ? `  <details><summary>Details</summary>\n  ${lines.join('\n  ')}\n  </details>\n` : ''}\n`;
+	const [firstLine, ...lines] = message.split(/\r?\n/);
+	return `* ${firstLine}\n${
+		lines.length ? `  <details><summary>Details</summary>\n  ${lines.join('\n  ')}\n  </details>\n` : ''
+	}\n`;
 }
 
 export const command = 'release <repo> <tag> [options]';
 
-export const describe = 'generate release notes, where <repo> is the GitHub repository to use and the <tag> is the git tag to use as a base for the release.';
+export const describe =
+	'generate release notes, where <repo> is the GitHub repository to use and the <tag> is the git tag to use as a base for the release.';
 
-export const builder: CommandBuilder = function (yargs) {
+export const builder: CommandBuilder = function(yargs) {
 	return yargs
 		.example('$0 release foo v2.0.0', 'creates release notes for repository dojo/foo for tag v2.0.0')
 		.example('$0 release foo v2.0.0 --org foo', 'creates release notes for repository foo/foo for tag v2.0.0')
 		.options({
-			'draft': {
+			draft: {
 				describe: 'release notes should be generated as a draft',
 				default: true,
 				type: 'boolean'
 			},
-			'from': {
+			from: {
 				describe: 'instead of the previous tag in the repository, generate the release notes from this tag',
 				type: 'string'
 			},
-			'org': {
+			org: {
 				alias: 'owner',
 				describe: 'the GitHub organization/owner',
 				default: 'dojo',
 				type: 'string'
 			},
-			'prerelease': {
-				describe: 'The release notes should be marked as a "pre release", defaults to being determined by the tag name',
+			prerelease: {
+				describe:
+					'The release notes should be marked as a "pre release", defaults to being determined by the tag name',
 				type: 'boolean'
 			}
 		});
@@ -84,7 +88,7 @@ export async function handler({ draft, from, org, prerelease, repo, tag }: Relea
 		console.error(red(`Could not parse release tag: ${tag}\n`));
 		return;
 	}
-	const [ , version, preReleaseTag, release ] = parsedTag;
+	const [, version, preReleaseTag, release] = parsedTag;
 	const name = preReleaseTag ? `Release ${version} ${initialCap(preReleaseTag)} ${release}` : `Release ${version}`;
 
 	// retrieve the available tags for the repository
@@ -92,10 +96,10 @@ export async function handler({ draft, from, org, prerelease, repo, tag }: Relea
 	let page = 1;
 	let tagResponse = await getTags(org, repo, page);
 	while (tagResponse.length) {
-		tagData = [ ...tagData, ...tagResponse ];
+		tagData = [...tagData, ...tagResponse];
 		tagResponse = await getTags(org, repo, ++page);
 	}
-	const tags = tagData.map(({ name, commit: { sha }}) => {
+	const tags = tagData.map(({ name, commit: { sha } }) => {
 		return { name, sha };
 	});
 	const tagIndex = tags.map(({ name }) => name).indexOf(tag);
@@ -118,7 +122,8 @@ export async function handler({ draft, from, org, prerelease, repo, tag }: Relea
 
 	// take all the commit messages, filtering out any metadata update only messages
 	const messages = comparison.commits
-		.map((commit) => commit.commit.message).filter((message) => !message.match(/Update\spackage\smetadata/i));
+		.map((commit) => commit.commit.message)
+		.filter((message) => !message.match(/Update\spackage\smetadata/i));
 	// remove the last commit message, which should just be the meta data update message
 	messages.pop();
 
@@ -153,8 +158,7 @@ export async function handler({ draft, from, org, prerelease, repo, tag }: Relea
 			}
 			if (label.name === 'enhancement') {
 				info.category = 'enhancement';
-			}
-			else if (label.name === 'bug') {
+			} else if (label.name === 'bug') {
 				info.category = 'fix';
 			}
 		}
@@ -162,22 +166,24 @@ export async function handler({ draft, from, org, prerelease, repo, tag }: Relea
 		const commitResolves = info.message.match(RESOLVES_REGEX);
 		// if the commit message looks like it is fixing an issue, we will lookup that issue
 		if (commitResolves) {
-			const [ , resolveOrg, resolveRepo, resolveIssueNumber ] = commitResolves;
+			const [, resolveOrg, resolveRepo, resolveIssueNumber] = commitResolves;
 			const resolvesIssue = await getIssue(resolveOrg || org, resolveRepo || repo, Number(resolveIssueNumber));
 			resolvesIssue.labels.forEach(checkLabel);
-		}
-		// if we found the PR from the message, look it up
-		else if (info.pr) {
+		} else if (info.pr) {
+			// if we found the PR from the message, look it up
 			const issue = await getIssue(org, repo, info.pr);
 			const resolves = issue.body.match(RESOLVES_REGEX);
 			// If it looks like the PR resolves another issue, we will use the labels on that issue
 			if (resolves) {
-				const [ , resolveOrg, resolveRepo, resolveIssueNumber ] = resolves;
-				const resolvesIssue = await getIssue(resolveOrg || org, resolveRepo || repo, Number(resolveIssueNumber));
+				const [, resolveOrg, resolveRepo, resolveIssueNumber] = resolves;
+				const resolvesIssue = await getIssue(
+					resolveOrg || org,
+					resolveRepo || repo,
+					Number(resolveIssueNumber)
+				);
 				resolvesIssue.labels.forEach(checkLabel);
-			}
-			// otherwise we will just look at labels on the PR
-			else {
+			} else {
+				// otherwise we will just look at labels on the PR
 				issue.labels.forEach(checkLabel);
 			}
 		}
@@ -186,26 +192,26 @@ export async function handler({ draft, from, org, prerelease, repo, tag }: Relea
 	console.log();
 
 	// Now we create a structure the categorise the changes
-	const changes = commitInfo.reduce((changeMap, info) => {
-		if (!info.category) {
-			changeMap.uncategorized.push(info.message);
-		}
-		else if (info.category === 'breaking') {
-			changeMap.breaking.push(info.message);
-		}
-		else if (info.category === 'enhancement') {
-			changeMap.enhancement.push(info.message);
-		}
-		else {
-			changeMap.fix.push(info.message);
-		}
-		return changeMap;
-	}, {
-		breaking: [],
-		enhancement: [],
-		fix: [],
-		uncategorized: []
-	} as Changes);
+	const changes = commitInfo.reduce(
+		(changeMap, info) => {
+			if (!info.category) {
+				changeMap.uncategorized.push(info.message);
+			} else if (info.category === 'breaking') {
+				changeMap.breaking.push(info.message);
+			} else if (info.category === 'enhancement') {
+				changeMap.enhancement.push(info.message);
+			} else {
+				changeMap.fix.push(info.message);
+			}
+			return changeMap;
+		},
+		{
+			breaking: [],
+			enhancement: [],
+			fix: [],
+			uncategorized: []
+		} as Changes
+	);
 
 	// Now we will assemble it into the release notes body
 	let body = '';

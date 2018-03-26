@@ -14,7 +14,6 @@ export namespace Bubba {
  * Interfaces for objects on GitHub
  */
 export namespace GitHub {
-
 	interface Asset {
 		url: string;
 		browser_download_url: string;
@@ -53,7 +52,7 @@ export namespace GitHub {
 			reason: string;
 			signature: string;
 			payload: string;
-		}
+		};
 	}
 
 	interface CommitFile {
@@ -118,7 +117,7 @@ export namespace GitHub {
 			html_url: string;
 			diff_url: string;
 			patch_url: string;
-		},
+		};
 		closed_at: string | null;
 		created_at: string;
 		updated_at: string | null;
@@ -209,13 +208,13 @@ export namespace GitHub {
 		commit: Commit;
 		author: Person;
 		committer: Person;
-		parents: { url: string; sha: string; }[];
+		parents: { url: string; sha: string }[];
 		stats: {
 			additions: number;
 			deletions: number;
 			total: number;
-		}
-		files: CommitFile[]
+		};
+		files: CommitFile[];
 	}
 
 	interface Tag {
@@ -225,7 +224,7 @@ export namespace GitHub {
 		commit: {
 			sha: string;
 			url: string;
-		}
+		};
 	}
 
 	/**
@@ -239,7 +238,7 @@ export namespace GitHub {
 				sha: string;
 				type: string;
 				url: string;
-			}
+			};
 		}
 
 		interface Tag {
@@ -256,7 +255,7 @@ export namespace GitHub {
 				type: string;
 				sha: string;
 				url: string;
-			}
+			};
 		}
 	}
 
@@ -286,4 +285,3 @@ export namespace GitHub {
 		}
 	}
 }
-

@@ -2,7 +2,7 @@
 	"dojo": [
 		"cli",
 		"cli-build-app",
-		"cli-build-widgets"
+		"cli-build-widgets",
 		"cli-create-app",
 		"cli-create-theme",
 		"cli-create-widget",
